@@ -1139,3 +1139,222 @@ ul { list-style: none; }
     min-height: 75vh;
   }
 }
+
+/* ══════════════════════════════════════════════
+   WORK / PROJECTS SECTION
+══════════════════════════════════════════════ */
+
+.work {
+  padding: 80px 0;
+}
+
+.work-header {
+  margin-bottom: 64px;
+  align-items: flex-end;
+}
+
+@media (min-width: 992px) {
+  .work-header__sub {
+    padding-bottom: 6px;
+  }
+}
+
+.work-project {
+  padding: 64px 0;
+  border-top: 1px solid var(--border);
+}
+
+.work-project:last-of-type {
+  border-bottom: 1px solid var(--border);
+}
+
+@media (min-width: 992px) {
+  .work-project--reverse .row {
+    flex-direction: row-reverse;
+  }
+  .work-project--reverse .work-project__visual-col {
+    padding-left: 0;
+    padding-right: 32px;
+  }
+  .work-project .work-project__visual-col {
+    padding-right: 0;
+    padding-left: 32px;
+  }
+}
+
+/* Browser chrome frame */
+.work-browser {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.work-browser__bar {
+  background: var(--bg-hover);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.work-browser__dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.work-browser__url {
+  background: var(--bg-elevated);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: var(--font-mono);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.work-browser__screen {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.work-browser__screen--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.work-browser__screen--green { background: rgba(134, 197, 65, 0.06); }
+.work-browser__screen--blue  { background: rgba(146, 213, 242, 0.06); }
+.work-browser__screen--pink  { background: rgba(242, 146, 196, 0.06); }
+
+.work-placeholder__inner { text-align: center; }
+.work-placeholder__label {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+/* Project content column */
+.work-project__content {
+  padding-top: 24px;
+}
+
+@media (min-width: 992px) {
+  .work-project__content {
+    padding-top: 0;
+    padding-left: 48px;
+  }
+  .work-project--reverse .work-project__content {
+    padding-left: 16px;
+    padding-right: 48px;
+  }
+}
+
+/* Industry/type tag pill */
+.work-project__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--pink-dim);
+  border: 1px solid var(--pink-border);
+  color: #ffffff;
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  margin-bottom: 20px;
+}
+
+.work-project__tag-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.work-project__problem {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.work-project__heading {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+}
+
+.work-project__body {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+/* Outcome list */
+.work-outcomes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+  list-style: none;
+  padding: 0;
+}
+
+.work-outcome {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.work-outcome__check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* View all footer */
+.work-footer {
+  padding-top: 48px;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 991px) {
+  .work { padding: 60px 0; }
+  .work-header { margin-bottom: 40px; }
+  .work-project { padding: 48px 0; }
+  .work-project__content { padding-top: 32px; }
+}
+
+@media (max-width: 767px) {
+  .work { padding: 48px 0; }
+  .work-project { padding: 36px 0; }
+}

@@ -438,6 +438,32 @@ function whitbyweb_register_acf_fields() {
                                 'type'          => 'text',
                                 'default_value' => '5.0 stars from all reviews',
                             ],
+                            [
+                                'key'           => 'field_reviews_limit',
+                                'label'         => 'Number to Show',
+                                'name'          => 'limit',
+                                'type'          => 'number',
+                                'instructions'  => 'Leave blank or -1 to show all.',
+                                'default_value' => -1,
+                                'min'           => -1,
+                            ],
+                            [
+                                'key'   => 'field_reviews_show_all',
+                                'label' => 'Show "See all reviews" button',
+                                'name'  => 'show_all_link',
+                                'type'  => 'true_false',
+                                'ui'    => 1,
+                            ],
+                            [
+                                'key'               => 'field_reviews_all_url',
+                                'label'             => '"See all reviews" URL',
+                                'name'              => 'all_url',
+                                'type'              => 'url',
+                                'default_value'     => '/reviews/',
+                                'conditional_logic' => [
+                                    [ [ 'field' => 'field_reviews_show_all', 'operator' => '==', 'value' => '1' ] ],
+                                ],
+                            ],
                         ],
                     ],
 

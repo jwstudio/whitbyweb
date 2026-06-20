@@ -60,7 +60,8 @@ $outcome_colors = [
         $problem_label = get_field( 'project_problem_label' ) ?: 'The problem';
         $body          = get_field( 'project_body' );
         $outcomes      = get_field( 'project_outcomes' );
-        $project_url   = get_field( 'project_url' );
+        // Use custom URL if set, otherwise link to the project post itself
+        $project_url   = get_field( 'project_url' ) ?: get_the_permalink();
         $browser_url   = get_field( 'project_browser_url' );
         $screenshot    = get_field( 'project_screenshot' );
         $placeholder   = get_field( 'project_placeholder_color' ) ?: 'green';
@@ -83,11 +84,9 @@ $outcome_colors = [
 
         if ( $screenshot ) {
             $visual_col .= '<img
-                src="' . esc_url( $screenshot['url'] ) . '"
+                src="' . esc_url( $screenshot['sizes']['large'] ?? $screenshot['url'] ) . '"
                 alt="' . esc_attr( $screenshot['alt'] ?: get_the_title() ) . '"
                 class="work-browser__screen"
-                width="' . (int) $screenshot['width'] . '"
-                height="' . (int) $screenshot['height'] . '"
                 loading="' . ( $index === 0 ? 'eager' : 'lazy' ) . '"
               />';
         } else {
@@ -131,9 +130,7 @@ $outcome_colors = [
             $content_col .= '</ul>';
         }
 
-        if ( $project_url ) {
-            $content_col .= '<a href="' . esc_url( $project_url ) . '" class="btn btn-secondary">See the project' . $btn_arrow . '</a>';
-        }
+        $content_col .= '<a href="' . esc_url( $project_url ) . '" class="btn btn-secondary">View project' . $btn_arrow . '</a>';
 
         $content_col .= '</div>';
 
