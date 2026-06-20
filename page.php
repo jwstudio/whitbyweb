@@ -18,6 +18,9 @@
               case 'work':
                   get_template_part( 'template-parts/blocks/work' );
                   break;
+              case 'usp':
+                  get_template_part( 'template-parts/blocks/usp' );
+                  break;
               case 'one_page_promo':
                   get_template_part( 'template-parts/blocks/one-page-promo' );
                   break;

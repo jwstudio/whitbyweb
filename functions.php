@@ -50,6 +50,23 @@ function whitbyweb_register_cpts() {
         'rewrite'      => false,
     ] );
 
+    register_taxonomy( 'project_type', 'project', [
+        'labels'            => [
+            'name'          => 'Project Types',
+            'singular_name' => 'Project Type',
+            'menu_name'     => 'Project Types',
+            'add_new_item'  => 'Add New Project Type',
+            'edit_item'     => 'Edit Project Type',
+        ],
+        'hierarchical'      => false,
+        'public'            => true,
+        'show_ui'           => true,
+        'show_in_menu'      => true,
+        'show_admin_column' => true,
+        'rewrite'           => [ 'slug' => 'work/type' ],
+        'show_in_rest'      => true,
+    ] );
+
     register_post_type( 'project', [
         'labels'       => [
             'name'          => 'Projects',
@@ -549,6 +566,84 @@ function whitbyweb_register_acf_fields() {
                         ],
                     ],
 
+                    // ── Unique Selling Points ─────────────────────────────
+                    'layout_usp' => [
+                        'key'        => 'layout_usp',
+                        'name'       => 'usp',
+                        'label'      => 'Unique Selling Points',
+                        'display'    => 'block',
+                        'sub_fields' => [
+                            [
+                                'key'   => 'field_usp_eyebrow',
+                                'label' => 'Eyebrow',
+                                'name'  => 'eyebrow',
+                                'type'  => 'text',
+                            ],
+                            [
+                                'key'          => 'field_usp_heading_lines',
+                                'label'        => 'Heading Lines',
+                                'name'         => 'heading_lines',
+                                'type'         => 'repeater',
+                                'layout'       => 'table',
+                                'min'          => 1,
+                                'button_label' => 'Add Line',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_usp_hl_text',
+                                        'label' => 'Text',
+                                        'name'  => 'text',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_usp_hl_highlight',
+                                        'label' => 'Highlighted',
+                                        'name'  => 'highlighted',
+                                        'type'  => 'true_false',
+                                        'ui'    => 1,
+                                    ],
+                                ],
+                            ],
+                            [
+                                'key'   => 'field_usp_lead',
+                                'label' => 'Lead Paragraph',
+                                'name'  => 'lead',
+                                'type'  => 'textarea',
+                                'rows'  => 2,
+                            ],
+                            [
+                                'key'     => 'field_usp_columns',
+                                'label'   => 'Grid Columns',
+                                'name'    => 'columns',
+                                'type'    => 'select',
+                                'choices' => [ '2' => '2 Columns', '3' => '3 Columns' ],
+                                'default_value' => '3',
+                            ],
+                            [
+                                'key'          => 'field_usp_items',
+                                'label'        => 'Items',
+                                'name'         => 'items',
+                                'type'         => 'repeater',
+                                'layout'       => 'block',
+                                'button_label' => 'Add Item',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_usp_item_title',
+                                        'label' => 'Title',
+                                        'name'  => 'title',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_usp_item_sub',
+                                        'label' => 'Subtitle',
+                                        'name'  => 'sub',
+                                        'type'  => 'textarea',
+                                        'rows'  => 2,
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+
                     // ── One-Page Promo (uses Global Settings) ─────────────
                     'layout_one_page_promo' => [
                         'key'        => 'layout_one_page_promo',
@@ -741,6 +836,25 @@ function whitbyweb_register_acf_fields() {
     ] );
 
     // ════════════════════════════════════════════════════════════════════════
+    // PROJECT TYPE TAXONOMY — colour per term
+    // ════════════════════════════════════════════════════════════════════════
+    acf_add_local_field_group( [
+        'key'      => 'group_project_type_term',
+        'title'    => 'Project Type Settings',
+        'location' => [ [ [ 'param' => 'taxonomy', 'operator' => '==', 'value' => 'project_type' ] ] ],
+        'fields'   => [
+            [
+                'key'           => 'field_project_type_color',
+                'label'         => 'Dot Colour',
+                'name'          => 'term_color',
+                'type'          => 'color_picker',
+                'default_value' => '#92d5f2',
+                'instructions'  => 'Colour shown on the category dot in the work section.',
+            ],
+        ],
+    ] );
+
+    // ════════════════════════════════════════════════════════════════════════
     // TESTIMONIAL FIELDS
     // ════════════════════════════════════════════════════════════════════════
     acf_add_local_field_group( [
@@ -774,27 +888,6 @@ function whitbyweb_register_acf_fields() {
         'location' => [ [ [ 'param' => 'post_type', 'operator' => '==', 'value' => 'project' ] ] ],
         'fields'   => [
             [
-                'key'         => 'field_project_category',
-                'label'       => 'Category',
-                'name'        => 'project_category',
-                'type'        => 'text',
-                'placeholder' => 'e.g. E-commerce',
-            ],
-            [
-                'key'           => 'field_project_tag_color',
-                'label'         => 'Category Dot Colour',
-                'name'          => 'project_tag_color',
-                'type'          => 'color_picker',
-                'default_value' => '#86c541',
-            ],
-            [
-                'key'           => 'field_project_problem_label',
-                'label'         => 'Problem Label',
-                'name'          => 'project_problem_label',
-                'type'          => 'text',
-                'default_value' => 'The problem',
-            ],
-            [
                 'key'   => 'field_project_body',
                 'label' => 'Body',
                 'name'  => 'project_body',
@@ -815,22 +908,7 @@ function whitbyweb_register_acf_fields() {
                         'name'  => 'text',
                         'type'  => 'text',
                     ],
-                    [
-                        'key'     => 'field_project_outcome_color',
-                        'label'   => 'Colour',
-                        'name'    => 'color',
-                        'type'    => 'select',
-                        'choices' => [ 'green' => 'Green', 'blue' => 'Blue', 'pink' => 'Pink' ],
-                        'default_value' => 'green',
-                    ],
                 ],
-            ],
-            [
-                'key'          => 'field_project_url',
-                'label'        => 'Case Study URL',
-                'name'         => 'project_url',
-                'type'         => 'url',
-                'instructions' => 'Leave blank to hide the "See the project" button.',
             ],
             [
                 'key'         => 'field_project_browser_url',
@@ -854,7 +932,7 @@ function whitbyweb_register_acf_fields() {
                 'name'          => 'project_placeholder_color',
                 'type'          => 'select',
                 'choices'       => [ 'green' => 'Green', 'blue' => 'Blue', 'pink' => 'Pink' ],
-                'default_value' => 'green',
+                'default_value' => 'blue',
                 'instructions'  => 'Shown when no screenshot is uploaded.',
             ],
         ],
