@@ -508,7 +508,7 @@ ul { list-style: none; }
 .btn-primary   { background: var(--text-primary); color: var(--bg-base); }
 
 .btn-secondary {
-  background: transparent;
+  background: var(--bg-base);
   color: var(--text-primary);
   border: 1px solid var(--border);
 }
