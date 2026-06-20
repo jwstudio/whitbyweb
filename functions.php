@@ -16,7 +16,7 @@ function whitbyweb_enqueue_assets() {
         'whitbyweb-style',
         get_stylesheet_uri(),
         [ 'whitbyweb-fonts' ],
-        '1.3.0'
+        '1.3.1'
     );
 }
 add_action( 'wp_enqueue_scripts', 'whitbyweb_enqueue_assets' );
@@ -70,6 +70,25 @@ function whitbyweb_register_cpts() {
 }
 add_action( 'init', 'whitbyweb_register_cpts' );
 
+// ─── ACF Options Page ─────────────────────────────────────────────────────────
+
+add_action( 'acf/init', 'whitbyweb_register_options_page' );
+
+function whitbyweb_register_options_page() {
+    if ( ! function_exists( 'acf_add_options_page' ) ) {
+        return;
+    }
+
+    acf_add_options_page( [
+        'page_title'  => 'Global Settings',
+        'menu_title'  => 'Global Settings',
+        'menu_slug'   => 'whitbyweb-global-settings',
+        'capability'  => 'edit_posts',
+        'icon_url'    => 'dashicons-admin-settings',
+        'redirect'    => false,
+    ] );
+}
+
 // ─── ACF Field Groups ─────────────────────────────────────────────────────────
 
 add_action( 'acf/init', 'whitbyweb_register_acf_fields' );
@@ -79,69 +98,206 @@ function whitbyweb_register_acf_fields() {
         return;
     }
 
-    // ── Heading Lines sub-fields (reused across multiple layouts) ────────────
-    $heading_lines_field = [
-        'key'        => 'field_heading_lines',
-        'label'      => 'Heading Lines',
-        'name'       => 'heading_lines',
-        'type'       => 'repeater',
-        'instructions' => 'Each row is one line of the heading. Tick "Highlighted" to wrap that line in the gradient colour.',
-        'layout'     => 'table',
-        'min'        => 1,
-        'button_label' => 'Add Line',
-        'sub_fields' => [
-            [
-                'key'          => 'field_heading_line_text',
-                'label'        => 'Text',
-                'name'         => 'text',
-                'type'         => 'text',
-                'column_width' => '75',
-            ],
-            [
-                'key'          => 'field_heading_line_highlight',
-                'label'        => 'Highlighted',
-                'name'         => 'highlighted',
-                'type'         => 'true_false',
-                'ui'           => 1,
-                'column_width' => '25',
-            ],
-        ],
-    ];
+    // ════════════════════════════════════════════════════════════════════════
+    // GLOBAL SETTINGS OPTIONS PAGE
+    // ════════════════════════════════════════════════════════════════════════
+    acf_add_local_field_group( [
+        'key'      => 'group_global_settings',
+        'title'    => 'Global Settings',
+        'location' => [ [ [ 'param' => 'options_page', 'operator' => '==', 'value' => 'whitbyweb-global-settings' ] ] ],
+        'fields'   => [
 
-    // ── Button repeater sub-fields ───────────────────────────────────────────
-    $buttons_field = [
-        'key'          => 'field_buttons',
-        'label'        => 'Buttons',
-        'name'         => 'buttons',
-        'type'         => 'repeater',
-        'layout'       => 'table',
-        'button_label' => 'Add Button',
-        'sub_fields'   => [
+            // ── One-Page Promo ───────────────────────────────────────────
             [
-                'key'   => 'field_btn_label',
-                'label' => 'Label',
-                'name'  => 'label',
-                'type'  => 'text',
+                'key'   => 'field_tab_opp',
+                'label' => 'One-Page Promo',
+                'name'  => '',
+                'type'  => 'tab',
             ],
             [
-                'key'   => 'field_btn_url',
-                'label' => 'URL',
-                'name'  => 'url',
-                'type'  => 'url',
+                'key'           => 'field_global_opp_eyebrow',
+                'label'         => 'Eyebrow',
+                'name'          => 'opp_eyebrow',
+                'type'          => 'text',
+                'default_value' => 'One-Page Websites',
             ],
             [
-                'key'     => 'field_btn_style',
-                'label'   => 'Style',
-                'name'    => 'style',
-                'type'    => 'select',
-                'choices' => [
-                    'primary'   => 'Primary',
-                    'secondary' => 'Secondary',
+                'key'        => 'field_global_opp_heading_lines',
+                'label'      => 'Heading Lines',
+                'name'       => 'opp_heading_lines',
+                'type'       => 'repeater',
+                'instructions' => 'Each row = one line. Tick "Highlighted" for gradient colour.',
+                'layout'     => 'table',
+                'min'        => 1,
+                'button_label' => 'Add Line',
+                'sub_fields' => [
+                    [
+                        'key'   => 'field_global_opp_hl_text',
+                        'label' => 'Text',
+                        'name'  => 'text',
+                        'type'  => 'text',
+                    ],
+                    [
+                        'key'   => 'field_global_opp_hl_highlight',
+                        'label' => 'Highlighted',
+                        'name'  => 'highlighted',
+                        'type'  => 'true_false',
+                        'ui'    => 1,
+                    ],
                 ],
-                'default_value' => 'primary',
+            ],
+            [
+                'key'   => 'field_global_opp_lead',
+                'label' => 'Lead Paragraph',
+                'name'  => 'opp_lead',
+                'type'  => 'textarea',
+                'rows'  => 3,
+            ],
+            [
+                'key'          => 'field_global_opp_buttons',
+                'label'        => 'Buttons',
+                'name'         => 'opp_buttons',
+                'type'         => 'repeater',
+                'layout'       => 'table',
+                'button_label' => 'Add Button',
+                'sub_fields'   => [
+                    [
+                        'key'   => 'field_global_opp_btn_label',
+                        'label' => 'Label',
+                        'name'  => 'label',
+                        'type'  => 'text',
+                    ],
+                    [
+                        'key'   => 'field_global_opp_btn_url',
+                        'label' => 'URL',
+                        'name'  => 'url',
+                        'type'  => 'url',
+                    ],
+                    [
+                        'key'     => 'field_global_opp_btn_style',
+                        'label'   => 'Style',
+                        'name'    => 'style',
+                        'type'    => 'select',
+                        'choices' => [ 'primary' => 'Primary', 'secondary' => 'Secondary' ],
+                        'default_value' => 'primary',
+                    ],
+                ],
+            ],
+            [
+                'key'           => 'field_global_opp_card_eyebrow',
+                'label'         => 'Feature Card Eyebrow',
+                'name'          => 'opp_card_eyebrow',
+                'type'          => 'text',
+                'default_value' => "What's included",
+            ],
+            [
+                'key'          => 'field_global_opp_features',
+                'label'        => 'Features',
+                'name'         => 'opp_features',
+                'type'         => 'repeater',
+                'layout'       => 'table',
+                'button_label' => 'Add Feature',
+                'sub_fields'   => [
+                    [
+                        'key'   => 'field_global_opp_feat_title',
+                        'label' => 'Title',
+                        'name'  => 'title',
+                        'type'  => 'text',
+                    ],
+                    [
+                        'key'   => 'field_global_opp_feat_sub',
+                        'label' => 'Subtitle',
+                        'name'  => 'sub',
+                        'type'  => 'text',
+                    ],
+                ],
+            ],
+
+            // ── Global CTA Defaults ──────────────────────────────────────
+            [
+                'key'   => 'field_tab_cta',
+                'label' => 'CTA Defaults',
+                'name'  => '',
+                'type'  => 'tab',
+            ],
+            [
+                'key'           => 'field_global_cta_eyebrow',
+                'label'         => 'Eyebrow',
+                'name'          => 'cta_eyebrow',
+                'type'          => 'text',
+                'default_value' => 'Get in Touch',
+            ],
+            [
+                'key'        => 'field_global_cta_heading_lines',
+                'label'      => 'Heading Lines',
+                'name'       => 'cta_heading_lines',
+                'type'       => 'repeater',
+                'layout'     => 'table',
+                'min'        => 1,
+                'button_label' => 'Add Line',
+                'sub_fields' => [
+                    [
+                        'key'   => 'field_global_cta_hl_text',
+                        'label' => 'Text',
+                        'name'  => 'text',
+                        'type'  => 'text',
+                    ],
+                    [
+                        'key'   => 'field_global_cta_hl_highlight',
+                        'label' => 'Highlighted',
+                        'name'  => 'highlighted',
+                        'type'  => 'true_false',
+                        'ui'    => 1,
+                    ],
+                ],
+            ],
+            [
+                'key'   => 'field_global_cta_lead',
+                'label' => 'Lead Paragraph',
+                'name'  => 'cta_lead',
+                'type'  => 'textarea',
+                'rows'  => 3,
+            ],
+            [
+                'key'          => 'field_global_cta_buttons',
+                'label'        => 'Buttons',
+                'name'         => 'cta_buttons',
+                'type'         => 'repeater',
+                'layout'       => 'table',
+                'button_label' => 'Add Button',
+                'sub_fields'   => [
+                    [
+                        'key'   => 'field_global_cta_btn_label',
+                        'label' => 'Label',
+                        'name'  => 'label',
+                        'type'  => 'text',
+                    ],
+                    [
+                        'key'   => 'field_global_cta_btn_url',
+                        'label' => 'URL',
+                        'name'  => 'url',
+                        'type'  => 'url',
+                    ],
+                    [
+                        'key'     => 'field_global_cta_btn_style',
+                        'label'   => 'Style',
+                        'name'    => 'style',
+                        'type'    => 'select',
+                        'choices' => [ 'primary' => 'Primary', 'secondary' => 'Secondary' ],
+                        'default_value' => 'primary',
+                    ],
+                ],
+            ],
+            [
+                'key'           => 'field_global_cta_portrait',
+                'label'         => 'Portrait Image',
+                'name'          => 'cta_portrait',
+                'type'          => 'image',
+                'return_format' => 'array',
+                'preview_size'  => 'medium',
             ],
         ],
-    ];
+    ] );
 
     // ════════════════════════════════════════════════════════════════════════
     // PAGE BUILDER — flexible content for Pages
@@ -168,13 +324,37 @@ function whitbyweb_register_acf_fields() {
                         'display'    => 'block',
                         'sub_fields' => [
                             [
-                                'key'   => 'field_hero_pill_text',
-                                'label' => 'Pill Text',
-                                'name'  => 'pill_text',
-                                'type'  => 'text',
+                                'key'         => 'field_hero_pill_text',
+                                'label'       => 'Pill Text',
+                                'name'        => 'pill_text',
+                                'type'        => 'text',
                                 'placeholder' => 'e.g. Ask about our one-page websites',
                             ],
-                            whitbyweb_make_unique( $heading_lines_field, 'hero' ),
+                            [
+                                'key'          => 'field_hero_heading_lines',
+                                'label'        => 'Heading Lines',
+                                'name'         => 'heading_lines',
+                                'type'         => 'repeater',
+                                'instructions' => 'Each row = one line. Tick "Highlighted" for gradient colour.',
+                                'layout'       => 'table',
+                                'min'          => 1,
+                                'button_label' => 'Add Line',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_hero_hl_text',
+                                        'label' => 'Text',
+                                        'name'  => 'text',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_hero_hl_highlight',
+                                        'label' => 'Highlighted',
+                                        'name'  => 'highlighted',
+                                        'type'  => 'true_false',
+                                        'ui'    => 1,
+                                    ],
+                                ],
+                            ],
                             [
                                 'key'   => 'field_hero_lead',
                                 'label' => 'Lead Paragraph',
@@ -182,27 +362,56 @@ function whitbyweb_register_acf_fields() {
                                 'type'  => 'textarea',
                                 'rows'  => 3,
                             ],
-                            whitbyweb_make_unique( $buttons_field, 'hero' ),
                             [
-                                'key'         => 'field_hero_form_id',
-                                'label'       => 'Formidable Form ID',
-                                'name'        => 'form_id',
-                                'type'        => 'number',
-                                'instructions' => 'The numeric ID of the Formidable form to embed in the card.',
+                                'key'          => 'field_hero_buttons',
+                                'label'        => 'Buttons',
+                                'name'         => 'buttons',
+                                'type'         => 'repeater',
+                                'layout'       => 'table',
+                                'button_label' => 'Add Button',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_hero_btn_label',
+                                        'label' => 'Label',
+                                        'name'  => 'label',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_hero_btn_url',
+                                        'label' => 'URL',
+                                        'name'  => 'url',
+                                        'type'  => 'url',
+                                    ],
+                                    [
+                                        'key'     => 'field_hero_btn_style',
+                                        'label'   => 'Style',
+                                        'name'    => 'style',
+                                        'type'    => 'select',
+                                        'choices' => [ 'primary' => 'Primary', 'secondary' => 'Secondary' ],
+                                        'default_value' => 'primary',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'key'           => 'field_hero_form_id',
+                                'label'         => 'Formidable Form ID',
+                                'name'          => 'form_id',
+                                'type'          => 'number',
+                                'instructions'  => 'The numeric ID of the Formidable form to embed in the card.',
                                 'default_value' => 1,
                             ],
                             [
-                                'key'   => 'field_hero_form_title',
-                                'label' => 'Form Card Title',
-                                'name'  => 'form_title',
-                                'type'  => 'text',
+                                'key'           => 'field_hero_form_title',
+                                'label'         => 'Form Card Title',
+                                'name'          => 'form_title',
+                                'type'          => 'text',
                                 'default_value' => 'Get a free quote',
                             ],
                             [
-                                'key'   => 'field_hero_form_subtitle',
-                                'label' => 'Form Card Subtitle',
-                                'name'  => 'form_subtitle',
-                                'type'  => 'text',
+                                'key'           => 'field_hero_form_subtitle',
+                                'label'         => 'Form Card Subtitle',
+                                'name'          => 'form_subtitle',
+                                'type'          => 'text',
                                 'default_value' => 'Tell us about your project. We reply within 24 hours.',
                             ],
                         ],
@@ -232,111 +441,13 @@ function whitbyweb_register_acf_fields() {
                         ],
                     ],
 
-                    // ── Services ─────────────────────────────────────────
+                    // ── Services (hardcoded — no sub_fields needed) ───────
                     'layout_services' => [
                         'key'        => 'layout_services',
                         'name'       => 'services',
                         'label'      => 'Services',
                         'display'    => 'block',
-                        'sub_fields' => [
-                            [
-                                'key'           => 'field_services_eyebrow',
-                                'label'         => 'Eyebrow',
-                                'name'          => 'eyebrow',
-                                'type'          => 'text',
-                                'default_value' => 'What We Do',
-                            ],
-                            whitbyweb_make_unique( $heading_lines_field, 'services' ),
-                            [
-                                'key'   => 'field_services_lead',
-                                'label' => 'Lead Paragraph',
-                                'name'  => 'lead',
-                                'type'  => 'textarea',
-                                'rows'  => 3,
-                            ],
-                            [
-                                'key'          => 'field_services_cards',
-                                'label'        => 'Service Cards',
-                                'name'         => 'service_cards',
-                                'type'         => 'repeater',
-                                'layout'       => 'block',
-                                'button_label' => 'Add Service',
-                                'sub_fields'   => [
-                                    [
-                                        'key'     => 'field_svc_icon',
-                                        'label'   => 'Icon',
-                                        'name'    => 'icon',
-                                        'type'    => 'select',
-                                        'choices' => [
-                                            'new-website'  => 'New Website',
-                                            'redesign'     => 'Redesign & Rebuild',
-                                            'speed'        => 'Speed Optimisation',
-                                            'one-page'     => 'One-Page Website',
-                                            'seo'          => 'SEO',
-                                            'maintenance'  => 'Maintenance',
-                                            'ecommerce'    => 'E-commerce',
-                                            'custom'       => 'Custom (paste SVG below)',
-                                        ],
-                                        'default_value' => 'new-website',
-                                    ],
-                                    [
-                                        'key'          => 'field_svc_icon_custom',
-                                        'label'        => 'Custom Icon SVG',
-                                        'name'         => 'icon_custom',
-                                        'type'         => 'textarea',
-                                        'instructions' => 'Paste the full &lt;svg&gt; tag here. Only used when Icon = "Custom".',
-                                        'rows'         => 4,
-                                        'conditional_logic' => [
-                                            [ [ 'field' => 'field_svc_icon', 'operator' => '==', 'value' => 'custom' ] ],
-                                        ],
-                                    ],
-                                    [
-                                        'key'   => 'field_svc_title',
-                                        'label' => 'Title',
-                                        'name'  => 'title',
-                                        'type'  => 'text',
-                                    ],
-                                    [
-                                        'key'   => 'field_svc_body',
-                                        'label' => 'Body',
-                                        'name'  => 'body',
-                                        'type'  => 'textarea',
-                                        'rows'  => 3,
-                                    ],
-                                    [
-                                        'key'          => 'field_svc_tags',
-                                        'label'        => 'Tags',
-                                        'name'         => 'tags',
-                                        'type'         => 'text',
-                                        'instructions' => 'Comma-separated. e.g. Design, Development, WordPress',
-                                    ],
-                                ],
-                            ],
-                            [
-                                'key'   => 'field_services_cta_eyebrow',
-                                'label' => 'CTA Card — Eyebrow',
-                                'name'  => 'cta_eyebrow',
-                                'type'  => 'text',
-                                'default_value' => 'Based in Devon',
-                            ],
-                            whitbyweb_make_unique( $heading_lines_field, 'services_cta' ),
-                            [
-                                'key'   => 'field_services_cta_body',
-                                'label' => 'CTA Card — Body',
-                                'name'  => 'cta_body',
-                                'type'  => 'textarea',
-                                'rows'  => 2,
-                            ],
-                            whitbyweb_make_unique( $buttons_field, 'services_cta' ),
-                            [
-                                'key'   => 'field_services_cta_photo',
-                                'label' => 'CTA Card — Photo',
-                                'name'  => 'cta_photo',
-                                'type'  => 'image',
-                                'return_format' => 'array',
-                                'preview_size'  => 'medium',
-                            ],
-                        ],
+                        'sub_fields' => [],
                     ],
 
                     // ── Work / Projects ───────────────────────────────────
@@ -353,7 +464,30 @@ function whitbyweb_register_acf_fields() {
                                 'type'          => 'text',
                                 'default_value' => 'Our Work',
                             ],
-                            whitbyweb_make_unique( $heading_lines_field, 'work' ),
+                            [
+                                'key'          => 'field_work_heading_lines',
+                                'label'        => 'Heading Lines',
+                                'name'         => 'heading_lines',
+                                'type'         => 'repeater',
+                                'layout'       => 'table',
+                                'min'          => 1,
+                                'button_label' => 'Add Line',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_work_hl_text',
+                                        'label' => 'Text',
+                                        'name'  => 'text',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_work_hl_highlight',
+                                        'label' => 'Highlighted',
+                                        'name'  => 'highlighted',
+                                        'type'  => 'true_false',
+                                        'ui'    => 1,
+                                    ],
+                                ],
+                            ],
                             [
                                 'key'   => 'field_work_lead',
                                 'label' => 'Intro Paragraph',
@@ -366,7 +500,7 @@ function whitbyweb_register_acf_fields() {
                                 'label'         => 'Number of Projects to Show',
                                 'name'          => 'limit',
                                 'type'          => 'number',
-                                'instructions'  => 'Leave blank or set to -1 to show all.',
+                                'instructions'  => 'Leave blank or -1 to show all.',
                                 'default_value' => -1,
                             ],
                             [
@@ -389,62 +523,16 @@ function whitbyweb_register_acf_fields() {
                         ],
                     ],
 
-                    // ── One-Page Promo ────────────────────────────────────
+                    // ── One-Page Promo (uses Global Settings) ─────────────
                     'layout_one_page_promo' => [
                         'key'        => 'layout_one_page_promo',
                         'name'       => 'one_page_promo',
                         'label'      => 'One-Page Promo',
                         'display'    => 'block',
-                        'sub_fields' => [
-                            [
-                                'key'           => 'field_opp_eyebrow',
-                                'label'         => 'Eyebrow',
-                                'name'          => 'eyebrow',
-                                'type'          => 'text',
-                                'default_value' => 'One-Page Websites',
-                            ],
-                            whitbyweb_make_unique( $heading_lines_field, 'opp' ),
-                            [
-                                'key'   => 'field_opp_lead',
-                                'label' => 'Lead Paragraph',
-                                'name'  => 'lead',
-                                'type'  => 'textarea',
-                                'rows'  => 3,
-                            ],
-                            whitbyweb_make_unique( $buttons_field, 'opp' ),
-                            [
-                                'key'           => 'field_opp_card_eyebrow',
-                                'label'         => 'Feature Card Eyebrow',
-                                'name'          => 'card_eyebrow',
-                                'type'          => 'text',
-                                'default_value' => "What's included",
-                            ],
-                            [
-                                'key'          => 'field_opp_features',
-                                'label'        => 'Features',
-                                'name'         => 'features',
-                                'type'         => 'repeater',
-                                'layout'       => 'table',
-                                'button_label' => 'Add Feature',
-                                'sub_fields'   => [
-                                    [
-                                        'key'   => 'field_opp_feat_title',
-                                        'label' => 'Title',
-                                        'name'  => 'title',
-                                        'type'  => 'text',
-                                    ],
-                                    [
-                                        'key'   => 'field_opp_feat_sub',
-                                        'label' => 'Subtitle',
-                                        'name'  => 'sub',
-                                        'type'  => 'text',
-                                    ],
-                                ],
-                            ],
-                        ],
+                        'sub_fields' => [],
                     ],
 
-                    // ── CTA ───────────────────────────────────────────────
+                    // ── CTA Banner ────────────────────────────────────────
                     'layout_cta' => [
                         'key'        => 'layout_cta',
                         'name'       => 'cta',
@@ -453,27 +541,77 @@ function whitbyweb_register_acf_fields() {
                         'sub_fields' => [
                             [
                                 'key'           => 'field_cta_eyebrow',
-                                'label'         => 'Eyebrow',
+                                'label'         => 'Eyebrow (leave blank to use Global default)',
                                 'name'          => 'eyebrow',
                                 'type'          => 'text',
-                                'default_value' => 'Get in Touch',
                             ],
-                            whitbyweb_make_unique( $heading_lines_field, 'cta' ),
+                            [
+                                'key'          => 'field_cta_heading_lines',
+                                'label'        => 'Heading Lines (leave empty to use Global default)',
+                                'name'         => 'heading_lines',
+                                'type'         => 'repeater',
+                                'layout'       => 'table',
+                                'button_label' => 'Add Line',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_cta_hl_text',
+                                        'label' => 'Text',
+                                        'name'  => 'text',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_cta_hl_highlight',
+                                        'label' => 'Highlighted',
+                                        'name'  => 'highlighted',
+                                        'type'  => 'true_false',
+                                        'ui'    => 1,
+                                    ],
+                                ],
+                            ],
                             [
                                 'key'   => 'field_cta_lead',
-                                'label' => 'Lead Paragraph',
+                                'label' => 'Lead Paragraph (leave blank to use Global default)',
                                 'name'  => 'lead',
                                 'type'  => 'textarea',
                                 'rows'  => 3,
                             ],
-                            whitbyweb_make_unique( $buttons_field, 'cta' ),
                             [
-                                'key'            => 'field_cta_portrait',
-                                'label'          => 'Portrait Image',
-                                'name'           => 'portrait',
-                                'type'           => 'image',
-                                'return_format'  => 'array',
-                                'preview_size'   => 'medium',
+                                'key'          => 'field_cta_buttons',
+                                'label'        => 'Buttons (leave empty to use Global default)',
+                                'name'         => 'buttons',
+                                'type'         => 'repeater',
+                                'layout'       => 'table',
+                                'button_label' => 'Add Button',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_cta_btn_label',
+                                        'label' => 'Label',
+                                        'name'  => 'label',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_cta_btn_url',
+                                        'label' => 'URL',
+                                        'name'  => 'url',
+                                        'type'  => 'url',
+                                    ],
+                                    [
+                                        'key'     => 'field_cta_btn_style',
+                                        'label'   => 'Style',
+                                        'name'    => 'style',
+                                        'type'    => 'select',
+                                        'choices' => [ 'primary' => 'Primary', 'secondary' => 'Secondary' ],
+                                        'default_value' => 'primary',
+                                    ],
+                                ],
+                            ],
+                            [
+                                'key'           => 'field_cta_portrait',
+                                'label'         => 'Portrait Image (leave blank to use Global default)',
+                                'name'          => 'portrait',
+                                'type'          => 'image',
+                                'return_format' => 'array',
+                                'preview_size'  => 'medium',
                             ],
                         ],
                     ],
@@ -485,12 +623,35 @@ function whitbyweb_register_acf_fields() {
                         'label'      => 'Contact',
                         'display'    => 'block',
                         'sub_fields' => [
-                            whitbyweb_make_unique( $heading_lines_field, 'contact' ),
                             [
-                                'key'   => 'field_contact_subtext',
-                                'label' => 'Sub-text',
-                                'name'  => 'subtext',
-                                'type'  => 'text',
+                                'key'          => 'field_contact_heading_lines',
+                                'label'        => 'Heading Lines',
+                                'name'         => 'heading_lines',
+                                'type'         => 'repeater',
+                                'layout'       => 'table',
+                                'min'          => 1,
+                                'button_label' => 'Add Line',
+                                'sub_fields'   => [
+                                    [
+                                        'key'   => 'field_contact_hl_text',
+                                        'label' => 'Text',
+                                        'name'  => 'text',
+                                        'type'  => 'text',
+                                    ],
+                                    [
+                                        'key'   => 'field_contact_hl_highlight',
+                                        'label' => 'Highlighted',
+                                        'name'  => 'highlighted',
+                                        'type'  => 'true_false',
+                                        'ui'    => 1,
+                                    ],
+                                ],
+                            ],
+                            [
+                                'key'           => 'field_contact_subtext',
+                                'label'         => 'Sub-text',
+                                'name'          => 'subtext',
+                                'type'          => 'text',
                                 'default_value' => 'Tell us about your project. We aim to reply within 24 hours.',
                             ],
                             [
@@ -501,34 +662,34 @@ function whitbyweb_register_acf_fields() {
                                 'default_value' => 'Get in touch',
                             ],
                             [
-                                'key'   => 'field_contact_email',
+                                'key'  => 'field_contact_email',
                                 'label' => 'Email Address',
                                 'name'  => 'email',
                                 'type'  => 'email',
                             ],
                             [
-                                'key'   => 'field_contact_fb_url',
+                                'key'  => 'field_contact_fb_url',
                                 'label' => 'Facebook URL',
                                 'name'  => 'facebook_url',
                                 'type'  => 'url',
                             ],
                             [
-                                'key'   => 'field_contact_ig_url',
+                                'key'  => 'field_contact_ig_url',
                                 'label' => 'Instagram URL',
                                 'name'  => 'instagram_url',
                                 'type'  => 'url',
                             ],
                             [
-                                'key'   => 'field_contact_li_url',
+                                'key'  => 'field_contact_li_url',
                                 'label' => 'LinkedIn URL',
                                 'name'  => 'linkedin_url',
                                 'type'  => 'url',
                             ],
                             [
-                                'key'         => 'field_contact_form_id',
-                                'label'       => 'Formidable Form ID',
-                                'name'        => 'form_id',
-                                'type'        => 'number',
+                                'key'           => 'field_contact_form_id',
+                                'label'         => 'Formidable Form ID',
+                                'name'          => 'form_id',
+                                'type'          => 'number',
                                 'default_value' => 1,
                             ],
                             [
@@ -633,21 +794,17 @@ function whitbyweb_register_acf_fields() {
                         'label'   => 'Colour',
                         'name'    => 'color',
                         'type'    => 'select',
-                        'choices' => [
-                            'green' => 'Green',
-                            'blue'  => 'Blue',
-                            'pink'  => 'Pink',
-                        ],
+                        'choices' => [ 'green' => 'Green', 'blue' => 'Blue', 'pink' => 'Pink' ],
                         'default_value' => 'green',
                     ],
                 ],
             ],
             [
-                'key'           => 'field_project_url',
-                'label'         => 'Case Study URL',
-                'name'          => 'project_url',
-                'type'          => 'url',
-                'instructions'  => 'Leave blank to hide the "See the project" button.',
+                'key'          => 'field_project_url',
+                'label'        => 'Case Study URL',
+                'name'         => 'project_url',
+                'type'         => 'url',
+                'instructions' => 'Leave blank to hide the "See the project" button.',
             ],
             [
                 'key'         => 'field_project_browser_url',
@@ -663,23 +820,16 @@ function whitbyweb_register_acf_fields() {
                 'type'          => 'image',
                 'return_format' => 'array',
                 'preview_size'  => 'medium',
-                'instructions'  => 'If empty, a placeholder is shown instead.',
+                'instructions'  => 'If empty, a coloured placeholder is shown instead.',
             ],
             [
                 'key'           => 'field_project_placeholder_color',
                 'label'         => 'Placeholder Colour',
                 'name'          => 'project_placeholder_color',
                 'type'          => 'select',
-                'choices'       => [
-                    'green' => 'Green',
-                    'blue'  => 'Blue',
-                    'pink'  => 'Pink',
-                ],
+                'choices'       => [ 'green' => 'Green', 'blue' => 'Blue', 'pink' => 'Pink' ],
                 'default_value' => 'green',
                 'instructions'  => 'Shown when no screenshot is uploaded.',
-                'conditional_logic' => [
-                    [ [ 'field' => 'field_project_screenshot', 'operator' => '==', 'value' => '' ] ],
-                ],
             ],
         ],
     ] );
@@ -688,98 +838,83 @@ function whitbyweb_register_acf_fields() {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 /**
- * Clone a shared sub-field array with unique keys for each layout context.
- * ACF requires every field key to be globally unique.
- */
-function whitbyweb_make_unique( array $field, string $context ): array {
-    $field['key']  = $field['key'] . '_' . $context;
-    $field['name'] = $field['name'];  // name stays the same — accessed via get_sub_field()
-
-    if ( ! empty( $field['sub_fields'] ) ) {
-        foreach ( $field['sub_fields'] as &$sub ) {
-            $sub['key'] = $sub['key'] . '_' . $context;
-            if ( ! empty( $sub['sub_fields'] ) ) {
-                foreach ( $sub['sub_fields'] as &$subsub ) {
-                    $subsub['key'] = $subsub['key'] . '_' . $context;
-                }
-            }
-        }
-        unset( $sub );
-    }
-
-    return $field;
-}
-
-/**
- * Render heading lines from a repeater field.
- * Each row: text (string) + highlighted (bool).
- * Outputs lines joined with <br>, wrapping highlighted ones in .gradient span.
+ * Render heading lines from a repeater.
+ * Works with both get_sub_field() context (inside flexible content)
+ * and get_field($name, 'option') context (options page).
  *
- * @param string $field_name  ACF field name (e.g. 'heading_lines').
- * @param string $tag         HTML tag: h1, h2, h3 …
- * @param string $class       CSS class for the element.
+ * @param array  $rows   Array of rows: [ ['text' => '', 'highlighted' => bool], ... ]
+ * @param string $tag    HTML heading tag.
+ * @param string $class  CSS class.
  */
-function whitbyweb_render_heading( string $field_name, string $tag = 'h2', string $class = 'section-heading' ): void {
-    if ( ! have_rows( $field_name ) ) {
+function whitbyweb_render_heading_from_rows( array $rows, string $tag = 'h2', string $class = 'section-heading' ): void {
+    if ( empty( $rows ) ) {
         return;
     }
 
     $lines = [];
-    while ( have_rows( $field_name ) ) {
-        the_row();
-        $text        = get_sub_field( 'text' );
-        $highlighted = get_sub_field( 'highlighted' );
-        $lines[]     = $highlighted
-            ? '<span class="gradient">' . esc_html( $text ) . '</span>'
-            : esc_html( $text );
+    foreach ( $rows as $row ) {
+        $text = esc_html( $row['text'] ?? '' );
+        $lines[] = ! empty( $row['highlighted'] )
+            ? '<span class="gradient">' . $text . '</span>'
+            : $text;
     }
 
-    printf(
-        '<%1$s class="%2$s">%3$s</%1$s>',
-        esc_attr( $tag ),
-        esc_attr( $class ),
-        implode( '<br>', $lines )
-    );
+    printf( '<%1$s class="%2$s">%3$s</%1$s>', esc_attr( $tag ), esc_attr( $class ), implode( '<br>', $lines ) );
 }
 
 /**
- * Render a button group from a repeater field.
- *
- * @param string $field_name  ACF field name (e.g. 'buttons').
+ * Render heading lines from an ACF sub_field repeater (flexible content context).
  */
-function whitbyweb_render_buttons( string $field_name ): void {
-    if ( ! have_rows( $field_name ) ) {
+function whitbyweb_render_heading( string $field_name, string $tag = 'h2', string $class = 'section-heading' ): void {
+    $rows = get_sub_field( $field_name );
+    if ( $rows ) {
+        whitbyweb_render_heading_from_rows( $rows, $tag, $class );
+    }
+}
+
+/**
+ * Render a button group from an array of button rows.
+ *
+ * @param array $buttons  Array of rows: [ ['label' => '', 'url' => '', 'style' => ''], ... ]
+ */
+function whitbyweb_render_buttons_from_rows( array $buttons ): void {
+    if ( empty( $buttons ) ) {
         return;
     }
 
-    echo '<div class="btn-group">';
     $arrow = '<span class="btn-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>';
 
-    while ( have_rows( $field_name ) ) {
-        the_row();
-        $label  = get_sub_field( 'label' );
-        $url    = get_sub_field( 'url' );
-        $style  = get_sub_field( 'style' ) ?: 'primary';
-        $is_primary = $style === 'primary';
-
+    echo '<div class="btn-group">';
+    foreach ( $buttons as $btn ) {
+        $label = $btn['label'] ?? '';
+        $url   = $btn['url'] ?? '';
+        $style = $btn['style'] ?: 'primary';
         printf(
             '<a href="%s" class="btn btn-%s">%s%s</a>',
             esc_url( $url ),
             esc_attr( $style ),
             esc_html( $label ),
-            $is_primary ? $arrow : ''
+            $style === 'primary' ? $arrow : ''
         );
     }
-
     echo '</div>';
+}
+
+/**
+ * Render a button group from an ACF sub_field repeater.
+ */
+function whitbyweb_render_buttons( string $field_name ): void {
+    $rows = get_sub_field( $field_name );
+    if ( $rows ) {
+        whitbyweb_render_buttons_from_rows( $rows );
+    }
 }
 
 /**
  * Return inline SVG for a named service icon.
  */
 function whitbyweb_service_icon( string $icon ): string {
-    $base = 'width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"';
-
+    $base  = 'width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"';
     $paths = [
         'new-website' => "<svg $base><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 9h18M9 21V9'/></svg>",
         'redesign'    => "<svg $base><path d='M12 20h9'/><path d='M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z'/></svg>",
